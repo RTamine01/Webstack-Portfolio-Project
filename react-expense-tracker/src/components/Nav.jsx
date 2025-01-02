@@ -13,7 +13,7 @@ const Nav = ({ userName }) => {
                 userName && (
                     <Form method="post" action="/logout"
                     onSubmit={(event) => {if (!confirm("remove user's data?"))
-                    {event()}
+                    {event.preventDefault()}
                     }}>
                         <button type="submit" className="btn btn--warning">
                             <span>Remove User</span>
