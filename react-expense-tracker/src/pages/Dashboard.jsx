@@ -1,8 +1,9 @@
 import { useLoaderData } from "react-router-dom";
-import { createBudget, fetchData, waait } from "../helpers";
+import { createBudget, createExpense, fetchData, waait } from "../helpers";
 import Intro from "../components/Intro";
 import { toast } from "react-toastify";
 import AddBudgetForm from "../components/AddBudgetForm";
+import AddExpenseForm from "../components/AddExpenseForm";
 
 export function DashboardLoader() {
     const userName = fetchData("userName");
@@ -14,6 +15,7 @@ export async function dashboardAction({ request }) {
     await waait();
     const data = await request.formData();
     const {_action, ...values} = Object.fromEntries(data);
+
     if (_action === "newUser") {
         try {
             localStorage.setItem("userName", JSON.stringify(values.userName));
@@ -34,6 +36,21 @@ export async function dashboardAction({ request }) {
             throw new Error("Problem creating budget");
         }
     }
+
+    if (_action === "createExpense") {
+        try {
+            createExpense({
+                name: values.newExpense,
+                amount: values.newExpenseAmount,
+                budgetId: values.newExpenseBudget
+            })
+
+
+            return toast.success(`Expense ${values.newExpense} created!`);
+        } catch (e) {
+            throw new Error("Problem creating Expense");
+        }
+    }
 }
 
 const Dashboard = () => {
@@ -47,11 +64,23 @@ const Dashboard = () => {
                  Welcome, <span className="accent">{userName}</span>
              </h1>
              <div className="grid-sm">
-                <div className="grid-lg">
+                {
+                    budgets && budgets.length > 0 ? (
+                    <div className="grid-lg">
                     <div className="flex-lg">
                         <AddBudgetForm />
+                        <AddExpenseForm budgets={budgets} />
                     </div>
                 </div>
+                )
+                : (
+                    <div className="grid-sm">
+                        <p>Controlling your spendings is key</p>
+                        <p>Create a budget to start</p>
+                        <AddBudgetForm />
+                    </div>
+                )
+                }
              </div>
         </div>
          ) : <Intro />}
