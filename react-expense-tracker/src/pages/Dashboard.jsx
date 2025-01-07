@@ -5,11 +5,13 @@ import { toast } from "react-toastify";
 import AddBudgetForm from "../components/AddBudgetForm";
 import AddExpenseForm from "../components/AddExpenseForm";
 import BudgetItem from "../components/BudgetItem";
+import Table from "../components/Table";
 
 export function DashboardLoader() {
     const userName = fetchData("userName");
     const budgets = fetchData("budgets");
-    return { userName, budgets };
+    const expenses = fetchData("expenses");
+    return { userName, budgets, expenses };
 }
 
 export async function dashboardAction({ request }) {
@@ -55,7 +57,7 @@ export async function dashboardAction({ request }) {
 }
 
 const Dashboard = () => {
-    const {userName, budgets} = useLoaderData()
+    const {userName, budgets, expenses} = useLoaderData()
     
   return (
     <>
@@ -80,6 +82,16 @@ const Dashboard = () => {
                                         ))
                                     }
                                 </div>
+                                {
+                                    expenses && expenses.length > 0 && (
+                                        <div className="grid-md">
+                                            <h2>Recent expenses</h2>
+                                            <Table expenses={expenses.sort((a, b) => b.createdAt - a.createdAt)
+                                                .slice(0, 8)
+                                            }/>
+                                        </div>
+                                    )
+                                }
                 </div>
                 )
                 : (
